@@ -36,7 +36,6 @@ print('''
 ╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═╝░░╚═╝░╚═════╝░╚══════╝╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░
 
 ''')
-print(f"{'%s,' * 5}"[:-1])
 
 #Listing all the tables in the database
 def show_tables():
@@ -78,9 +77,8 @@ def add_data(name, no_of_records):
             value = input("Enter value for "+ i + ": ")
             data.append(value)
 
-        query = f"INSERT INTO {name} values({'%s,' * len(column_names)})"
-        #({', '.join(['%s'] * len(column_names))})"
-        print(query)
+        query = f"INSERT INTO {name} values({'%s,' * len(column_names)})"[:-2]+')'
+
         try:
             cursor.execute(query, tuple(data))
             my_connector.commit()
@@ -151,16 +149,27 @@ def Search_Data(name):
 
     print(tabulate([array[mid]], headers=column_names, tablefmt="psql"))
 
-# def find_overlap():
-#     query = "SELECT * FROM " + name
-#     cursor.execute(query)
-#     result = cursor.fetchall()
+def find_overlap():
+    query = "SELECT * FROM bus_info" 
+    cursor.execute(query)
+    result = cursor.fetchall()
+    print(result)
 
-#     area_overlap = input('Enter the Area you want to find the overlap for: ')
-#     query1 = f"SELECT bus_no FROM bus_info WHERE area_covered = {area_overlap}"
+    array = []
+
+    for i in result:
+        if i[2] not in array:
+            array.append(i[2])
+        elif i[2] in array:
+            if i[1] < 60:
+                print("Potential Overlap Determined!")
 
 
+    # area_overlap = input('Enter the Area you want to find the overlap for: ')
+    # query1 = f"SELECT bus_no FROM bus_info WHERE area_covered = {area_overlap}"
 
+
+find_overlap()
 #Main Program Loop
 while True:
     #Main Menu
