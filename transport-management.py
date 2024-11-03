@@ -125,9 +125,10 @@ def Sort_Data(name):
         for j in range(i+1, len(array)):
             if array[i][0] > array[j][0]:
                 array[i], array[j] = array[j], array[i]
+    my_connector.commit()
     return array
 
-    my_connector.commit()
+    
 
 
 def Search_Data(name):
@@ -164,21 +165,20 @@ def find_overlap():
         if i[2] not in array:
             array.append(i[2])
         elif i[2] in array:
-            if i[1] < 60:
-                print("Potential Overlap Determined!")
+            if i[1] < 60:              
                 query = f"SELECT bus_no, area_covered FROM bus_info WHERE area_covered = '{i[2]}'"
                 cursor.execute(query)
                 result = cursor.fetchall() 
                 overlap_list.extend([i for i in result])
                 is_overlap = True
     if is_overlap:
+        print("Potential Overlap Determined!")
         column_names = ['Bus_No', 'Area_Covered'] 
         print(tabulate(overlap_list, headers=column_names, tablefmt="psql"))
     else:
         print("No Overlap Found. The routes are optimised!")
 
 
-find_overlap()
 #Main Program Loop
 while True:
     #Main Menu
@@ -187,7 +187,7 @@ while True:
     2 - Show Data
     3 - Add Data
     4 - Delete Data
-    5 - Analyse Data
+    5 - Analyse Data - Bus Info Table
     6 - Sort Data
     7 - Search for Data using Bus No.
     8 - Exit
@@ -211,9 +211,23 @@ while True:
         value = input("Enter a value from the column to identify the record you wish to delete: ")
         delete_data(table_name, column_name, value)        
 
-    elif choice == "5":
-        table_name = input("Enter the name of the table: ")
-        graph_data(table_name)
+    elif choice == "5":   
+        while True:
+            print ("""
+            Graph - View a Capacity Vs Bus_no Graph for all the buses
+            Overlap - Analyse the table to find potential overlaps between area covered by buses
+            Exit - Go Back to Main Menu
+            """)
+            subchoice = input("Enter Your Choice Here: ")
+            if subchoice == 'Graph':
+                 graph_data('bus_info')
+            elif subchoice == 'Overlap':
+                find_overlap()
+            elif subchoice == 'Exit':
+                break
+            else:
+                print("Please Enter a Valdid Choice")
+
 
     elif choice == '6':
         name = input("Enter Table name: ")
@@ -228,7 +242,6 @@ while True:
     elif choice == '7':
         name = input("Enter table Name: ")
         Search_Data(name)
-
 
     elif choice == "8":
         print("Thank You for using our Transport Management System!")
