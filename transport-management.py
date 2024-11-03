@@ -127,6 +127,8 @@ def Sort_Data(name):
                 array[i], array[j] = array[j], array[i]
     return array
 
+    my_connector.commit()
+
 
 def Search_Data(name):
     target = int(input("Enter the Bus No. you want to Search for: "))
@@ -150,12 +152,13 @@ def Search_Data(name):
     print(tabulate([array[mid]], headers=column_names, tablefmt="psql"))
 
 def find_overlap():
+    is_overlap = False
     query = "SELECT * FROM bus_info" 
     cursor.execute(query)
     result = cursor.fetchall()
-    print(result)
 
     array = []
+    overlap_list = []
 
     for i in result:
         if i[2] not in array:
@@ -163,10 +166,16 @@ def find_overlap():
         elif i[2] in array:
             if i[1] < 60:
                 print("Potential Overlap Determined!")
-
-
-    # area_overlap = input('Enter the Area you want to find the overlap for: ')
-    # query1 = f"SELECT bus_no FROM bus_info WHERE area_covered = {area_overlap}"
+                query = f"SELECT bus_no, area_covered FROM bus_info WHERE area_covered = '{i[2]}'"
+                cursor.execute(query)
+                result = cursor.fetchall() 
+                overlap_list.extend([i for i in result])
+                is_overlap = True
+    if is_overlap:
+        column_names = ['Bus_No', 'Area_Covered'] 
+        print(tabulate(overlap_list, headers=column_names, tablefmt="psql"))
+    else:
+        print("No Overlap Found. The routes are optimised!")
 
 
 find_overlap()
